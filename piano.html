@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head><title>SOUND</title></head>
+<body>
+	<div>Use las notas del teclado:
+		{Z S X D C V G B H N J M} para tocar el piano en la
+		a partir del Do de la 4 escala.</div>
+		<div> Las notas teclas corresponden a:</div>
+		<div><table>
+			<tr><th>Tecla 	</th><th>español </th><th>anglosajón </th></tr>
+			<tr><th>Z	</th><th>Do	</th><th>C</th></tr>
+			<tr><th>S	</th><th>Do#	</th><th>C#</th></tr>
+			<tr><th>X	</th><th>Re	</th><th>D</th></tr>
+			<tr><th>D	</th><th>Re#	</th><th>D#</th></tr>
+			<tr><th>C	</th><th>Mi	</th><th>E</th></tr>
+			<tr><th>V	</th><th>Fa	</th><th>F</th></tr>
+			<tr><th>G	</th><th>Fa#	</th><th>F#</th></tr>
+			<tr><th>B	</th><th>Sol	</th><th>G</th></tr>
+			<tr><th>H	</th><th>Sol#	</th><th>G#</th></tr>
+			<tr><th>N	</th><th>La	</th><th>A</th></tr>
+			<tr><th>J	</th><th>La#	</th><th>A#</th></tr>
+			<tr><th>M	</th><th>Si	</th><th>B</th></tr>
+		</table></div>
+	<div>Nota: <span id="nota"></span></div>
+	<div>Frequence: <span id="frequency"></span></div>
+	<script type="text/javascript">
+
+	var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+	var oscillatorNode = audioCtx.createOscillator();
+	var gainNode = audioCtx.createGain();
+	var mute = true;
+	var frequency = 0;
+	var volume = 0.8;
+	var keys = [
+				   // Key	nota	anglo
+		{key:90, nota:40}, // Z		Do	C
+		{key:83, nota:41}, // S		Do#	C#
+		{key:88, nota:42}, // X		Re	D
+		{key:68, nota:43}, // D		Re#	D#
+		{key:67, nota:44}, // C		Mi	E
+		{key:86, nota:45}, // V		Fa	F
+		{key:71, nota:46}, // G		Fa#	F#
+		{key:66, nota:47}, // B		Sol	G
+		{key:72, nota:48}, // H		Sol#	G#
+		{key:78, nota:49}, // N		La	A
+		{key:74, nota:50}, // J		La#	A#
+		{key:77, nota:51}, // M		Si	B
+	];
+
+	oscillatorNode.connect(gainNode);
+	gainNode.connect(audioCtx.destination)
+	oscillatorNode.start();
+	oscillatorNode.frequency.value = frequency;
+	gainNode.gain.value = 0;
+
+	(function manualLoop() {
+		setTimeout(function() {
+			manualLoop();
+			exp = (nota - 49) / 12;
+			frequency = Math.pow(2, exp)*440;
+			oscillatorNode.frequency.value = frequency;
+			document.getElementById('frequency').innerHTML = frequency.toFixed(2);
+			document.getElementById('nota').innerHTML = nota.toFixed(2);
+		}, 40)
+	}());
+
+	document.addEventListener('keydown', function(event) {
+		if (event.keyCode == 32) { // space bar
+			if (mute) {
+				gainNode.gain.value = volume;
+				mute = false;
+			} else {
+				gainNode.gain.value = 0;
+				mute = true;
+			}
+		}
+		for (var i = keys.length - 1; i >= 0; i--) {
+			if(event.keyCode == keys[i].key) {
+				gainNode.gain.value = volume;
+				nota = keys[i].nota;
+			}
+		}
+	});
+
+	document.addEventListener('keyup', function(event) {
+		//mute = true
+		gainNode.gain.value = 0;
+
+	});
+
+	</script>
+</body>
+</html>
